@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>Runner HTB</title>
+  <meta name="generator" content="CherryTree">
+
+</head>
+
+<body>
+  <div class='page'>
+    <h1 class='title'>Runner HTB</h1><br />
+    <p>Runner HTB</p>
+    <p></p>
+    <p>Nmap - revealed three open ports</p>
+    <p><img src="images/4-1.png" alt="images/4-1.png" /></p>
+    <p></p>
+    <p>Next, I ran a more intense scan using Nmap to identify any other hidden ports but to no effect. Next step, is to
+      add the runner.htb in the hosts file and start enumerating the web app. The app running over port 80 was fairly a
+      static one and one running over ‘8000’ was that of Nagios which is IT Infra Monitoring tool. Initially, I focused
+      on the Nagios app port to see if there were any vulnerabilities I could exploit for initial access. But, only ones
+      I found were that of a priv esc and a SQL injection that did not work.</p>
+    <p><img src="images/4-2.png" alt="images/4-2.png" /></p>
+    <p></p>
+    <p>Coming over to the main web app, lets start enumerating the directories and the subdomains running(if any).</p>
+    <p><img src="images/4-3.png" alt="images/4-3.png" /></p>
+    <p></p>
+    <p><img src="images/4-4.png" alt="images/4-4.png" /></p>
+    <p>In case of directory enumeration, I used two other tools to no effect. Initially, I had run the vhost of sub
+      domain scan as well, but I got no hit and I was stuck for some time. Then, I got some help and found out that my
+      wordlist (seclist/DNS/subdomain-topmillion) did not contain the particular subdomain for this box. So I ran
+      another vhost sca using another wordlist.</p>
+    <p><img src="images/4-5.png" alt="images/4-5.png" /></p>
+    <p>And, here it was. Teamcity.runer.htb gave me a login page. Teamcity is CI/CD tool used for automating software
+      development and testing. So, the next step is to find any default creds that ca take me in, if not, will have to
+      look for other vulns like SQLi, XSS(if signs of another user is present), etc. So I tried searching for default
+      creds, but again to no avail. However, I did a find a recent CVE on Teamcity that allows unauthenticated RCE.</p>
+    <p><img src="images/4-6.png" alt="images/4-6.png" /></p>
+    <p>So, I followed this to the dot. <a
+        href="https://www.rapid7.com/blog/post/2024/03/04/etr-cve-2024-27198-and-cve-2024-27199-jetbrains-teamcity-multiple-authentication-bypass-vulnerabilities-fixed/">https://www.rapid7.com/blog/post/2024/03/04/etr-cve-2024-27198-and-cve-2024-27199-jetbrains-teamcity-multiple-authentication-bypass-vulnerabilities-fixed/</a>
+    </p>
+    <p><img src="images/4-7.png" alt="images/4-7.png" /></p>
+    <p><img src="images/4-8.png" alt="images/4-8.png" /></p>
+    <p><img src="images/4-9.png" alt="images/4-9.png" /></p>
+    <p><img src="images/4-10.png" alt="images/4-10.png" /></p>
+    <p>Once I got access, I started poking around the Administration Panel. First, I went diagnostics and tried
+      uploading a PHP file to obtain a web shell and RCE, but did not work. Then, started poking the Backups section.
+    </p>
+    <p><img src="images/4-11.png" alt="images/4-11.png" /></p>
+    <p>In the database dump, I got the hashes of the users present. Thought I will try decrypting them ad try for SSH.
+    </p>
+    <p><img src="images/4-12.png" alt="images/4-12.png" /></p>
+    <p>So I got the creds for matthew. I also found a id_rsa file(SSH priv key) and tried to SSH using that. </p>
+    <p><img src="images/4-13.png" alt="images/4-13.png" /></p>
+    <p>The id_rsa file was John&#39;s. So now properly converting the permissions and everything, lets try to SSH as
+      John. And Initial access obtained!!!!!!</p>
+    <p><img src="images/4-14.png" alt="images/4-14.png" /></p>
+    <p></p>
+    <p></p>
+    <p>
+    <h1># Privilege Escalation</h1>
+    </p>
+    <p></p>
+    <p>So for Priv Esc, I tried the normal steps of sudo -l and su into matthew using the creds obtained. However, no
+      go. I also remembered that Teamcity was runnning out of /opt directory. However, I saw another folder named
+      Portainer which upon some help, I got to know is a software for managing dockers and containers(with a web
+      portal).</p>
+    <p><img src="images/4-15.png" alt="images/4-15.png" /></p>
+    <p>At the same time, I also ran Linpeas just for the routine of it to see if I was able to obtain any new
+      information on the box.</p>
+    <p><img src="images/4-16.png" alt="images/4-16.png" /></p>
+    <p>And got the Vhost!!! So the only conceivable step is to try logging in as Matthew whose creds have not been used
+      uptill now.(In cases of HTB, you are allowed to think line this xd). If not this, we would have had to using a
+      port forwardinng proxy such as chisel, or even SSH to forward the 9443 port to our attacker host system (Quite a
+      hassle!)</p>
+    <p><img src="images/4-17.png" alt="images/4-17.png" /></p>
+    <p>Now, that we have logged in, there is a priv esc we can do via this. However, the ones available online are
+      slightly outdated, but the process remains the same give or take.</p>
+    <p>Link: <a
+        href="https://rioasmara.com/2021/08/15/use-portainer-for-privilege-escalation/">https://rioasmara.com/2021/08/15/use-portainer-for-privilege-escalation/</a>
+    </p>
+    <p>First, create a volume for our containers that we will deploy to priv esc. This is available once you get into
+      the ‘primary’ section.</p>
+    <p><img src="images/4-18.png" alt="images/4-18.png" /></p>
+    <p>So create a volume. Follow the steps as in the link, that is copy the image hash from ‘Images’, create a new
+      container, paste the hash, set the command settings and the volume settings to ‘/mnt/root’. Then deploy the
+      container. Note that, there were some steps that must be followed while creating the volume. This is the outdated
+      part with respect to the link. </p>
+    <p><img src="images/4-19.png" alt="images/4-19.png" /></p>
+    <p>Next step, is go to the console section of the container created. After going to the console, connect as root
+      user, and get a shell into the container host. Then, basically cd into /mnt/root folder and get the root flag.</p>
+    <p><img src="images/4-20.png" alt="images/4-20.png" /></p>
+    <p>And obtain the root flag. So, overall this box was entertaining. I needed some help with the last volume drivers
+      part, which I couldnn&#39;t figure out.</p>
+  </div>
+</body>
+
+</html>
