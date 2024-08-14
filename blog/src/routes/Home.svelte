@@ -2,36 +2,41 @@
     import { onMount } from "svelte";
     import Layout from "../components/Layout.svelte";
     import { push } from 'svelte-spa-router';
-   
 
     let posts = [];
+    let error = null;
 
-    onMount(async ()=>{
-        const res = await fetch("/api/posts.json");
-        posts = await res.json();
+    onMount(async () => {
+        try {
+            const res = await fetch("/api/posts.json");
+            if (!res.ok) throw new Error('Failed to fetch posts');
+            posts = await res.json();
+        } catch (err) {
+            error = err.message;
+        }
     });
 
     function goToPost(post) {
-        push(`/posts/${post.id}`);
+        push(`/Post/${post.id}`);
+    }
+
+    function goToAbout() {
+        push('/about');
     }
 </script>
 
-<!-- svelte-ignore missing-declaration -->
-<main>
 <Layout title="Home">
     <h2>HTB Blog Posts</h2>
-    {#each posts as post}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <article on:click={() => goToPost(post)} style="cursor: pointer;" >
-            <h3>{post.title}</h3>
-            <p>{post.description}</p>
-        </article>
-    {/each}
+    {#if error}
+        <p>Error: {error}</p>
+    {:else if posts.length === 0}
+        <p>Loading posts...</p>
+    {:else}
+        {#each posts as post}
+            <article on:click={() => goToPost(post)} on:keydown={(e) => e.key === 'Enter' && goToPost(post)} tabindex="0" style="cursor: pointer;">
+                <h3>{post.title}</h3>
+                <p>{post.description}</p>
+            </article>
+        {/each}
+    {/if}
 </Layout>
-</main>
-
-<style>
-    article {
-        margin-bottom: 2rem;
-    }
-</style>

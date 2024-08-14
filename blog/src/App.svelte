@@ -1,20 +1,16 @@
 <script>
 	import Router  from 'svelte-spa-router';
 	import Home from './routes/Home.svelte';
-	import About from './routes/About.svelte';
+	import Test from './routes/About.svelte';
 	import Post from './routes/Posts.svelte';
 
 	const routes = {
     // Exact path
     '/': Home,
-
+    '/Post/:id': Post,
+	'/about': Test
     
-    '/about': About,
-
-   
-    '/Post/:id': Post
-    
-}
+};
 </script>
 
 <main>

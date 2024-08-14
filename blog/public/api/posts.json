@@ -3,6 +3,6 @@
         "id" : "1",
         "title" : "Runner HTB",
         "description" : "This is a simple walkthrough of the Runner HTB machine, based on my experience and skill sets. Ps: The places where I have mentioned I took help, actually means I took help from other posts and forums since I was stuck. Thanks",
-        "contentURL" : "../Runner/runner.html"
+        "contentURL" : "/Runner/runner.html"
     }
 ]
