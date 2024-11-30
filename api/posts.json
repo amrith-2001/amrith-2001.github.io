@@ -10,5 +10,11 @@
         "title" : "Cap HTB",
         "description" : "This is a simple walkthrough of the Cap HTB machine, based on my experience and skill sets.",
         "contentURL" : "/Cap/cap.html"
+    },
+    {
+        "id" : "3",
+        "title" : "Chemistry HTB",
+        "description" : "This is a simple walkthrough of the Chemistry HTB machine, based on my experience and skill sets.",
+        "contentURL" : "/Chemistry/chemistry.html"
     }
 ]
