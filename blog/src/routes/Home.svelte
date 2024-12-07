@@ -33,6 +33,7 @@
         <p>Loading posts...</p>
     {:else}
         {#each posts as post}
+            <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
             <article on:click={() => goToPost(post)} on:keydown={(e) => e.key === 'Enter' && goToPost(post)} tabindex="0" style="cursor: pointer;">
                 <h3>{post.title}</h3>
                 <p>{post.description}</p>
