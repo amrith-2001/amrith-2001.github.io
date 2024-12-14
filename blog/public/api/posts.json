@@ -16,5 +16,11 @@
         "title" : "Chemistry HTB",
         "description" : "This is a simple walkthrough of the Chemistry HTB machine, based on my experience and skill sets.",
         "contentURL" : "/Chemistry/Source/chem/chemistry.html"
+    },
+    {
+        "id" : "4",
+        "title" : "Sea HTB",
+        "description" : "This is a simple walkthrough of the Sea HTB machine, based on my experience and skill sets.",
+        "contentURL" : "/Sea/sea.html"
     }
 ]
