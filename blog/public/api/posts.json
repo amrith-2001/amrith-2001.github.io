@@ -22,5 +22,11 @@
         "title" : "Sea HTB",
         "description" : "This is a simple walkthrough of the Sea HTB machine, based on my experience and skill sets.",
         "contentURL" : "/Sea/sea.html"
+    },
+    {
+        "id" : "5",
+        "title" : "Alert HTB",
+        "description" : "This is a simple walkthrough of the Alert HTB machine, based on my experience and skill sets.",
+        "contentURL" : "/Alert/alert.html"
     }
 ]
